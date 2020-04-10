@@ -3,6 +3,7 @@ import requests
 import logging
 from lxml import etree
 
+
 logger = logging.getLogger()
 
 
@@ -49,36 +50,6 @@ class Spider:
             content_list.append(content)
         return content_list
 
-    def get_rss(self, content_list):
-        rss = ""
-        for tag in self.tag_set:
-            rss += '<outline title="%s" text="%s">\n' % (tag, tag)
-            for content in content_list:
-                if tag in content.get('tags'):
-                    rss += '<outline type="rss" '
-                    for i in range(3):
-                        key = self.name_list[i]
-                        value = content.get(key)
-                        if value:
-                            rss += '%s="%s" ' % (key, value)
-                    rss += 'title="%s" ' % content["text"]
-                    rss += "/>\n"
-            rss += '</outline>\n'
-        return rss
-
-    def save_to_opml(self, content_list):
-        rss_start = """<?xml version="1.0" encoding="UTF-8"?>\n<opml version="2.0">\n<head>\n<title>RSS</title>\n</head>\n<body>"""
-        rss_endswith = """</body>\n</opml>\n"""
-        rss = self.get_rss(content_list)
-        rss = rss.join([rss_start, rss_endswith])
-        with open("rss.opml", mode='w', encoding='utf-8') as f:
-            f.write(rss)
-
     def run(self):
         html_str = self.parse_url()
-        content_list = self.get_content(html_str)
-        self.save_to_opml(content_list)
-
-if __name__ == "__main__":
-    spider = Spider()
-    spider.run()
+        return self.get_content(html_str)
